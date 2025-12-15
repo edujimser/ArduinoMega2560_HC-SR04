@@ -1,0 +1,3 @@
+[submodule "ArduinoMega2560_ledControl"]
+	path = ArduinoMega2560_ledControl
+	url = https://github.com/edujimser/ArduinoMega2560.git
