@@ -204,3 +204,18 @@ bool isValidGPIO(const PinInfo& pin) {
 
     return false;
 };
+
+/* 
+* Returns true if the pin is a valid pin 
+*/
+bool isValidPWM(const PinInfo& pin) {
+    for (size_t i = 0; i < Pins::NUM_PWM; ++i) {
+        if (Pins::PWM[i].number == pin.number &&
+            Pins::PWM[i].family == pin.family) 
+        {
+            return true;
+        }
+    }
+
+    return false;
+};
