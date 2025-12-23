@@ -162,43 +162,86 @@ namespace Pins {
     constexpr size_t NUM_I2C        = sizeof(I2C) / sizeof(I2C[0]);
     constexpr size_t NUM_INTERRUPTS = sizeof(INTERRUPTS) / sizeof(INTERRUPTS[0]);
 
-    /*
-     * Enum PinFamily: Categorizes pins by their functional group
-     */
 }
 
-
-
-
-/*
- * Functions to map pin names or numbers to their physical identifiers across multiple interfaces
- * Implemented in pins.cpp
+ 
+/**
+ * @brief Initializes all system pins according to the predefined pinout tables.
+ *
+ * Loads pin information from the pinout arrays and configures the required pins
+ * (ANALOG, PWM, GPIO) as OUTPUT during initialization.
  */
+void initPins();
 
-// Return pin number
+/**
+ * @brief Returns the numeric Arduino pin associated with a PinInfo object.
+ *
+ * @param pin  PinInfo structure containing pin metadata.
+ * @return The pin number (0–69 on ATmega2560).
+ */
 uint8_t pinNumber(const PinInfo pin);
-// Return pin name 
+
+/**
+ * @brief Returns the human‑readable name of a pin.
+ *
+ * @param pin  PinInfo structure containing pin metadata.
+ * @return Pointer to a string containing the pin name.
+ */
 const char* pinName(const PinInfo pin);
-// Return pin family
+
+/**
+ * @brief Returns the functional family of a pin (UART, SPI, GPIO, etc.).
+ *
+ * @param pin  PinInfo structure containing pin metadata.
+ * @return Pointer to a string describing the pin family.
+ */
 const char* pinFamily(const PinInfo pin);
 
-/* 
-* Returns true if the pin is a valid pin 
-*/
+/**
+ * @brief Checks whether a given pin belongs to the GPIO family.
+ *
+ * @param pin  PinInfo structure containing pin metadata.
+ * @return true if the pin is a valid GPIO pin, false otherwise.
+ */
 bool isValidGPIO(const PinInfo pin);
 
-/*
- * Pin diagnostic functions
- * Implemented in pins.cpp
- */
 
-// Configures ANALOG  pins as INPUT and detects if voltage is present and it porcent
+
+
+
+/* -------------------------------------------------------------------------- */
+/*                               Diagnostics                                  */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * @brief Diagnoses all ANALOG pins.
+ *
+ * Configures each analog pin as INPUT and measures whether voltage is present.
+ * Also calculates and prints the approximate percentage of the input voltage.
+ */
 void diagnoseAnalog();
-// Configures GPIO  pins as INPUT and detects if voltage is present
+
+/**
+ * @brief Diagnoses all GPIO pins.
+ *
+ * Configures each GPIO pin as INPUT and checks whether a HIGH or LOW signal
+ * is detected.
+ */
 void diagnoseGPIO();
-// Configures PWM pins as INPUT and detects if voltage is present
+
+/**
+ * @brief Diagnoses all PWM pins.
+ *
+ * Configures each PWM pin as INPUT and checks whether voltage is present.
+ */
 void diagnosePWM();
-// Runs both diagnostics and prints results via Serial
+
+/**
+ * @brief Runs all pin diagnostics and prints the results via Serial.
+ *
+ * Executes analog, GPIO, and PWM diagnostics sequentially and outputs a
+ * complete report.
+ */
 void fullDiagnosticsPins();
 
 
