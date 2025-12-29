@@ -195,7 +195,7 @@ const char* pinFamily(const PinInfo pin);
  * @param pin  PinInfo structure containing pin metadata.
  * @return true if the pin is a valid GPIO pin, false otherwise.
  */
-bool isValidGPIO(const PinInfo pin);
+bool isValidGPIO(const PinInfo& pin);
 
 /**
  * @brief Checks whether a given pin belongs to the PWM family.
@@ -203,7 +203,7 @@ bool isValidGPIO(const PinInfo pin);
  * @param pin  PinInfo structure containing pin metadata.
  * @return true if the pin is a valid PWM pin, false otherwise.
  */
-bool isValidPWM(const PinInfo pin);
+bool isValidPWM(const PinInfo& pin);
 
 /**
  * @brief Checks whether a given pin belongs to the ANALOG family.
@@ -211,7 +211,7 @@ bool isValidPWM(const PinInfo pin);
  * @param pin  PinInfo structure containing pin metadata.
  * @return true if the pin is a valid ANALOG pin, false otherwise.
  */
-bool isValidAnalog(const PinInfo pin);
+bool isValidAnalog(const PinInfo& pin);
 
 
 /* -------------------------------------------------------------------------- */
