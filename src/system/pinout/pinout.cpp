@@ -219,3 +219,18 @@ bool isValidPWM(const PinInfo& pin) {
 
     return false;
 };
+
+/* 
+* Returns true if the pin is a valid pin 
+*/
+bool isValidAnalog(const PinInfo& pin) {
+    for (size_t i = 0; i < Pins::NUM_ANALOG; ++i) {
+        if (Pins::ANALOG[i].number == pin.number &&
+            Pins::ANALOG[i].family == pin.family) 
+        {
+            return true;
+        }
+    }
+
+    return false;
+};
