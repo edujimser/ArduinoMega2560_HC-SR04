@@ -1,5 +1,3 @@
-
-
 # ArduinoMega2560
 
 This repository contains code templates, configurations, and documentation designed for projects based on the Arduino Mega 2560 microcontroller (ATmega2560).  
@@ -12,8 +10,7 @@ Instead of starting from scratch, you can clone this repository and immediately 
 - Example modules for diagnostics, GPIO, PWM, UART, and EEPROM.
 - Documentation templates (README, diagrams, configuration notes) to keep your project organized.
 
-
-
+---
 
 ## Table of Contents
 
@@ -23,11 +20,14 @@ Instead of starting from scratch, you can clone this repository and immediately 
   - [Installation](#installation)
 - [Project Structure](#project-structure)
 - [Usage](#usage)
-- [Debug](#Debug)
+- [Debug](#debug)
 - [Functions](#functions)
 - [Arduino Mega 2560 Pinout](#arduino-mega-2560-pinout)
 - [PlatformIO Configuration](#platformio-configuration)
+- [HC-SR04 Ultrasonic Sensor Library](#hc-sr04-ultrasonic-sensor-library)
 - [License](#license)
+
+---
 
 ## Introduction
 
@@ -41,92 +41,75 @@ These instructions will guide you through setting up the project on your local m
 
 Before you begin, ensure you have the following installed:
 
--   [PlatformIO IDE](https://platformio.org/platformio-ide) (Installation guide available on the PlatformIO website)
+- [PlatformIO IDE](https://platformio.org/platformio-ide)
 
 ### Installation
 
-1.  **Clone the repository:**
+```bash
+git clone https://github.com/edujimser/ArduinoMega2560.git
+cd ArduinoMega2560
+```
 
-    ```bash
-    git clone https://github.com/edujimser/ArduinoMega2560.git
-    cd ArduinoMega2560
-    ```
+Open the project in PlatformIO IDE and build/upload as usual.
 
-2.  **Open the project in PlatformIO IDE:**
-
-    -   Launch PlatformIO IDE.
-    -   Click "Open Project" and select the cloned `ArduinoMega2560` directory.
-
-3.  **Build the project:**
-
-    -   In the PlatformIO IDE, click the "PlatformIO" icon in the bottom toolbar.
-    -   Select "Build" to compile the code.
-
-4.  **Upload the code to your Arduino Mega 2560:**
-
-    -   Connect your Arduino Mega 2560 to your computer via USB.
-    -   In the PlatformIO IDE, select "Upload" to flash the compiled code to your board.
+---
 
 ## Project Structure
 
-The project structure is organized as follows:
-
 ```
 ArduinoMega2560/
-├── .gitignore              # Specifies intentionally untracked files that Git should ignore
-├── .vscode/                # Contains VS Code specific settings
-├── include/                # Header files for the project
-├── lib/                    # Libraries used in the project
-│   └── avr-debugger/       # Example library (if applicable)
-├── platformio.ini          # PlatformIO configuration file
-├── src/                    # Source code files
-│   ├── main.cpp            # Main application file
-│   └── system/             # System-related source files (if applicable)
-└── README.md             # Project documentation
+├── .gitignore
+├── .vscode/
+├── include/
+├── lib/
+│   ├── avr-debugger/
+│   └── hc-sr04/          # HC-SR04 ultrasonic sensor library
+├── platformio.ini
+├── src/
+│   ├── main.cpp
+│   └── system/
+└── README.md
 ```
+
+---
 
 ## Usage
 
-The `src/main.cpp` file contains the main application logic. You can modify this file to implement your desired functionality.  Refer to the comments within `main.cpp` for guidance on how to use the code.
-
-Example (from `src/main.cpp`):
+Basic example in `src/main.cpp`:
 
 ```cpp
 #include <Arduino.h>
+#include "hc-sr04/hc-sr04.h"
+
+static PinInfo Trig = Pins::GPIO[29]; // Pin 50
+static PinInfo Echo = Pins::GPIO[30]; // Pin 51
+static HCSR04 sonar(Trig, Echo, 20);  // Max distance 20 cm
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(9600);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  Serial.println("Hello, Arduino!");
-  delay(1000);
+  sonar.printStateEcho(sonar.ping_cm());
+  delay(500);
 }
 ```
 
+---
+
 ## Debug
-This project includes a full debugging system for the Arduino Mega 2560 using **avr-stub**, **GDB**, and an **FT232BL** USB–Serial adapter.  
-This enables professional-level firmware debugging on a microcontroller that does not support hardware debugging natively.
 
----
+This project includes a debugging system for the Arduino Mega 2560 using **avr-stub**, **GDB**, and an **FT232BL** USB–Serial adapter. It enables advanced firmware debugging on a microcontroller that does not support hardware debugging natively.
 
-###  Requirements
+### Requirements for debug mode
 
-To use the debug mode, you will need:
+- Arduino Mega 2560  
+- FT232BL USB–Serial adapter  
+- PlatformIO (VSCode)  
+- `avr-stub` library (included in project)  
+- Wiring between FT232BL and Mega as described below
 
-- Arduino **Mega 2560**
-- **FT232BL** USB–Serial adapter
-- **PlatformIO** (VSCode)
-- The `avr-stub` library (already included in the project)
-- Basic wiring between the FT232BL and the Mega
-
----
-
-###  FT232BL Wiring
-
-Connect the FT232BL to the Mega 2560 as follows:
+### FT232BL Wiring
 
 | FT232BL | Mega 2560 |
 |---------|-----------|
@@ -134,13 +117,7 @@ Connect the FT232BL to the Mega 2560 as follows:
 | RXD     | TX0 (1)   |
 | GND     | GND       |
 
-> The FT232BL is used by GDB to communicate with the microcontroller.
-
----
-
-###  PlatformIO Configuration
-
-The debug environment is already defined in `platformio.ini`:
+### PlatformIO debug environment example
 
 ```ini
 [env:debug]
@@ -155,144 +132,143 @@ build_flags =
 
 lib_deps =
     jdolinay/avr-debugger
-
 ```
+
+---
 
 ## Functions
 
-Here's a description of the key functions used in the `src/main.cpp` file:
+- `setup()`: Called once at startup. Initialize pins, serial, peripherals.  
+- `loop()`: Main program loop. Read sensors, control actuators, handle logic.  
+- Helper modules and utilities are provided under `src/system/`.
 
-*   **`void setup()`**: This function is called once at the beginning of the program. It is typically used to initialize variables, set pin modes, start serial communication, and perform other setup tasks.
-
-    *   `Serial.begin(9600)`: Initializes serial communication at a baud rate of 9600. This allows the Arduino to send data to the serial monitor for debugging and monitoring.
-
-*   **`void loop()`**: This function is called repeatedly in an infinite loop. It contains the main logic of the program, such as reading sensor data, controlling actuators, and responding to user input.
-
-    *   `Serial.println("Hello, Arduino!")`: Prints the text "Hello, Arduino!" to the serial monitor.
-    *   `delay(1000)`: Pauses the program for 1000 milliseconds (1 second).
+---
 
 ## Arduino Mega 2560 Pinout
 
-The Arduino Mega 2560 has a variety of pins that can be used for different purposes:
+- **Digital Pins:** 0–53 (some with special functions)  
+- **Analog Inputs:** A0–A15  
+- **PWM Pins:** Marked with `~`  
+- **Serial Ports:** Multiple UARTs (Serial, Serial1, Serial2, Serial3)  
+- **SPI / I2C:** Dedicated pins for SPI and I2C communication  
+- **AREF / GND / VCC:** Power and reference pins
 
-*   **Digital Pins (0-53):** These pins can be configured as either inputs or outputs. Some digital pins have special functions, such as PWM (Pulse Width Modulation) for controlling the brightness of LEDs or the speed of motors.
-*   **Analog Input Pins (A0-A15):** These pins can read analog signals from sensors, such as potentiometers or temperature sensors.
-*   **PWM Pins:** Marked with a "~" symbol, these pins can be used for PWM output.
-*   **Serial Communication Pins (TX, RX):** Used for serial communication with other devices.
-*   **SPI Pins:** Used for SPI (Serial Peripheral Interface) communication.
-*   **I2C Pins (SDA, SCL):** Used for I2C (Inter-Integrated Circuit) communication.
-*   **AREF:** Analog Reference pin for analog inputs.
-*   **GND:** Ground pins.
+---
 
 ## PlatformIO Configuration
 
-The `platformio.ini` file configures the PlatformIO build environment for this project. Here's a breakdown of the key settings:
+The `platformio.ini` file configures the build environment. Key points:
+
+- `platform = atmelavr` and `board = megaatmega2560`  
+- `framework = arduino`  
+- Example build flags include `-std=gnu++17`, optimization flags, and debug macros  
+- Debugging support via `avr-stub` is included as an optional environment
+
+Example snippet:
 
 ```ini
-; PlatformIO Project Configuration File
-;
-;   Build options: build flags, source filter
-;   Upload options: custom upload port, speed, and extra flags
-;   Library options: dependencies, extra library storages
-;   Advanced options: extra scripting
-;
-; Please visit the documentation for other options and examples:
-; https://docs.platformio.org/page/projectconf.html
-
-;----------------------------------------------------------------------------------------------------------------------------------------------------------------
-;------ Project Configuration ------
 [env:megaatmega2560]
-platform = atmelavr           ; Specifies the development platform (Atmel AVR)
-board = megaatmega2560       ; Specifies the board (Arduino Mega 2560)
-framework = arduino            ; Specifies the framework (Arduino)
-upload_port = COM3             ; Port where your board is connected (e.g., COM3 on Windows, /dev/ttyUSB0 on Linux/Mac)
-monitor_port = COM3          ; Must match the physical port of your board (same as debug_port normally)
-                             ; To check the port in CMD: connect and disconnect the board, then run `mode` in CMD
-;----------------------------------------------------------------------------------------------------------------------------------------------------------------
-;------ Standard dependencies and extra configurations ------
-; Adapting the C++ version for the project: removing GNU++11 standard to insert GNU++17
-; https://docs.platformio.org/en/latest/projectconf/advanced_scripting.html#build-unflags-and-build-flags
+platform = atmelavr
+board = megaatmega2560
+framework = arduino
+upload_port = COM3
+monitor_port = COM3
+
 build_unflags = 
-    -std=gnu++11              ; Remove the C++11 standard to avoid conflicts with the C++17 standard
+    -std=gnu++11
+
 build_flags = 
-    -std=gnu++17              ; Use the C++17 standard with GNU extensions (more flexible than the pure standard)
-    -DAVR8_UART_NUMBER=3      ; Define a macro to indicate that UART number 3 will be used on AVR microcontrollers
-    -DEBUG_MODE=0             ; Activate debug mode to include debugging code
-    -Os                       ; Change the optimization level here:
-                                ; -O0  → no optimization (debugging)
-                                ; -O1  → light optimization
-                                ; -O2  → balanced optimization
-                                ; -O3  → maximum speed
-                                ; -Os  → optimize for size
-    -flto                     ; Enable Link Time Optimization (LTO) for better optimization across files
-    -fno-exceptions           ; Disable exceptions to reduce code size and improve performance
+    -std=gnu++17
+    -DAVR8_UART_NUMBER=3
+    -DDEBUG_MODE=0
+    -Os
+    -flto
+    -fno-exceptions
 
-;----------------------------------------------------------------------------------------------------------------------------------------------------------------
-;------ Artificial Debugging Dependencies ------
-; Notes:
-;   - Configure build_flags (DAVR8_UART_NUMBER, DEBUG_MODE) to activate debug mode
-; Activate simulated debugging system with avr-stub
-debug_tool = avr-stub         ; Uses the 'avr-debugger' library to simulate debugging on AVR chips
-; Virtual serial port for debugging
-debug_port = COM6             ; Port where your board is connected (e.g., COM3 on Windows, /dev/ttyUSB0 on Linux/Mac)
-                             ; To check the port in CMD: connect and disconnect the board, then run `mode` in CMD
-; Serial monitor communication speed
-monitor_speed = 57600         ; Baud rate. Must match the one used in Serial.begin() in your code
-
-;----------------------------------------------------------------------------------------------------------------------------------------------------------------
-;------ RFID-RC522 Dependencies ------
-; The following line tells PlatformIO to automatically download and include 
-; the MFRC522 library by Miguel Balboa from PlatformIO's official registry.
-; This library allows controlling the RFID RC522 reader module for reading/writing tags and cards.
-; lib_deps = /lib/Ard - opcional descomentar si se quiere usar la librería de Arduino por descarga
-
-[platformio]
-description = Sensors
+debug_tool = avr-stub
+debug_port = COM6
+monitor_speed = 57600
 ```
 
-### Explanation of Settings:
+---
 
-*   **`[env:megaatmega2560]`**: This section defines the environment for the Arduino Mega 2560 board.  `env` stands for environment. You can have multiple environments for different boards or configurations.
+## HC-SR04 Ultrasonic Sensor Library
 
-    *   `platform = atmelavr`: Specifies that the Atmel AVR platform will be used.
-    *   `board = megaatmega2560`:  Specifies that the target board is the Arduino Mega 2560.
-    *   `framework = arduino`: Specifies that the Arduino framework will be used.
-    *   `upload_port = COM3`: Defines the serial port used for uploading the compiled code to the board.  **Important:**  You need to change this to the correct port for your system (e.g., `/dev/ttyUSB0` on Linux, `COM3` or similar on Windows).
-    *   `monitor_port = COM3`: Defines the serial port used for the serial monitor. This should typically match the `upload_port`.
+This repository includes a custom library to control the **HC-SR04 ultrasonic distance sensor** with the Arduino Mega 2560. It uses direct port manipulation for optimized performance and provides clear state handling and range validation.
 
-*   **`build_unflags`**: These settings remove default compiler flags.
+### Library location
 
-    *   `-std=gnu++11`:  Removes the default C++11 standard flag. This is done to allow the use of C++17.
+```
+lib/hc-sr04/
+├── hc-sr04.h   # Header with class definition and constants
+└── hc-sr04.cpp # Implementation
+```
 
-*   **`build_flags`**: These settings add custom compiler flags.
+### Public API summary
 
-    *   `-std=gnu++17`:  Specifies that the C++17 standard should be used for compilation. C++17 provides more modern language features.
-    *   `-DAVR8_UART_NUMBER=3`: Defines a macro that might be used in the code to specify
+- `HCSR04(PinInfo PinTrigger, PinInfo PinEcho, unsigned int maxDistanceCm = HC_SR04_DEFAULT_MAX_DISTANCE_CM)`  
+  Constructor: configure trigger/echo pins and maximum distance.
 
-    ### License
-    
-    This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-    
-    ```
-    MIT License
-    
-    Copyright (c) [Año] [Nombre del titular del copyright]
-    
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-    
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
-    
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
-    ```
+- `unsigned long ping()`  
+  Returns measured echo time in microseconds (µs). Returns 0 on failure/timeout.
+
+- `unsigned long ping_cm()`  
+  Returns distance in centimeters (cm). Uses conversion factor `HC_SR04_CONVERSION_US_CM`.
+
+- `boolean pingTrigger()`  
+  Internal trigger/echo capture routine. Returns `true` on successful measurement.
+
+- `void printStateEcho(unsigned long distance)`  
+  Prints state and distance to Serial.
+
+### Constants used by the library
+
+```cpp
+#define HC_SR04_DEFAULT_MAX_DISTANCE_CM 50
+#define HC_SR04_CONVERSION_US_CM 58
+#define HC_SR04_DELAY_TRIGGER_MS 12
+#define HC_SR04_FAIL_CYCLES_LIMIT 20
+```
+
+### Features
+
+- Direct port manipulation for faster I/O on Mega2560.  
+- State machine for echo detection with distinct states: `ECHO_OK`, `ECHO_TIMEOUT_UP`, `ECHO_TIMEOUT_DOWN`, `ECHO_OK_OUT_LIMIT_CM`, `ECHO_NOOK`.  
+- Timeout calculation based on configured maximum distance:
+  ```cpp
+  maxEchotimeUs = maxDistanceCm * HC_SR04_CONVERSION_US_CM;
+  ```
+- Range validation: if computed distance > `maxDistanceCm`, library sets `ECHO_OK_OUT_LIMIT_CM`.
+
+### Example usage
+
+```cpp
+#include "hc-sr04/hc-sr04.h"
+
+static PinInfo Trig = Pins::GPIO[29]; // Pin 50
+static PinInfo Echo = Pins::GPIO[30]; // Pin 51
+static HCSR04 sonar(Trig, Echo, 100); // Max distance 100 cm
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+  unsigned long distance = sonar.ping_cm();
+  sonar.printStateEcho(distance);
+  delay(500);
+}
+```
+
+### Debugging tips
+
+- Print `flagEchoTime` (µs) before conversion to verify raw timing values.  
+- Use `pulseIn()` in a simple test sketch to confirm hardware wiring and sensor behavior before using direct port code.  
+- Ensure trigger pin is driven low for a short time before sending the 10–12 µs HIGH pulse.  
+- Keep sensor and wiring away from noisy power sources; add decoupling capacitors if needed.
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
