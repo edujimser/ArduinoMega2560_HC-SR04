@@ -137,9 +137,16 @@ void loop() {
     [[maybe_unused]] PinInfo gpio27   =         Pins::GPIO[27];                          /* GPIO48 → pin 48 */      pinMode(gpio27.number, OUTPUT);
     [[maybe_unused]] PinInfo gpio28   =         Pins::GPIO[28];                          /* GPIO49 → pin 49 */      pinMode(gpio28.number, OUTPUT);
     [[maybe_unused]] PinInfo gpio29   =         Pins::GPIO[29];                          /* GPIO50 → pin 50 */      pinMode(gpio29.number, OUTPUT);
-    [[maybe_unused]] PinInfo gpio30   =         Pins::GPIO[30];                          /* GPIO51 → pin 51 */      pinMode(gpio30.number, OUTPUT);
+    [[maybe_unused]] PinInfo gpio30   =         Pins::GPIO[30];                          /* GPIO51 → pin 51 */      pinMode(gpio30.number, INPUT);
     [[maybe_unused]] PinInfo gpio31   =         Pins::GPIO[31];                          /* GPIO52 → pin 52 */      pinMode(gpio31.number, OUTPUT);
     [[maybe_unused]] PinInfo gpio32   =         Pins::GPIO[32];                          /* GPIO53 → pin 53 */      pinMode(gpio32.number, OUTPUT);
 
+ 
+   static PinInfo Trig = Pins::GPIO[29]; // GPIO29 → pin 50
+   static PinInfo Echo = Pins::GPIO[30]; // GPIO28 → pin 51
+   static HCSR04 sonar(Trig, Echo, 20); // NewPing setup of pins and maximum distance.
 
+
+  sonar.printStateEcho(sonar.ping_cm());
+  delay(500);
 } 

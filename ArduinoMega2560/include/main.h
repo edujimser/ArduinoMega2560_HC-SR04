@@ -7,15 +7,16 @@
 #include "system/diagnostics/diagnosticsUART.h"                     // UART diagnostics functions
 #include "system/diagnostics/diagnosticsEEPROM.h"
 #include "system/config/config.h"                                   // System configuration parameters
-#include "system/pinout/pinout.h"                                   // Pinout definitions
+#include "system/pinout/pinout.h"                                   // Pinout definitions                                               // NewPing library for ultrasonic sensor
+#include "hc-sr04/hc-sr04.h"                                        // HC-SR04 ultrasonic sensor library
 
 // Firmware metadata =============================================================================================================================
 #define FIRMWARE_VERSION                 "1.0.B"                                    // Firmware version
 #define FIRMWARE_NAME                    "ArduinoMega2560"                          // Firmware name
 #define FIRMWARE_DATE                    "17/12/2025"                               // Firmware compilation date
 #define FIRMWARE_AUTHOR                  "Eduardo Jimenez Serrato"                  // Firmware author
-#define FIRMWARE_VERSION_APP             "N.A"                                      // Firmware version for application
-#define FIRMWARE_NAME_APP                "N.A"                                      // Firmware name
-#define FIRMWARE_DATE_APP                "N.A"                                      // Firmware compilation date
+#define FIRMWARE_VERSION_APP             "1.0.A"                                    // Firmware version for application
+#define FIRMWARE_NAME_APP                "Sensor_HC-SR04"                           // Firmware name
+#define FIRMWARE_DATE_APP                "21/01/2026"                               // Firmware compilation date
 
 #endif  // MAIN_H
